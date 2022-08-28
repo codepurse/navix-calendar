@@ -1,0 +1,102 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+body {
+  font-family: "Inter";
+}
+.calendar_container {
+  border: 1px solid lightgray;
+  width: max-content;
+  box-sizing: content-box;
+  padding: 10px 15px;
+  padding-bottom: 5px;
+  min-width: 250px;
+  position: relative;
+  height: fit-content;
+  transition: all 0.2s;
+}
+.calendarToggle {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  font-size: 1.2rem;
+  margin-bottom: -10px;
+  cursor: pointer;
+  i {
+    transition: all 0.2s;
+  }
+}
+.calendar_header {
+  display: flex;
+  margin-bottom: 5px;
+  background-color: transparent;
+  padding: 5px 5px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s;
+  button {
+    background-color: transparent;
+    outline: none !important;
+    border: 0px;
+    padding: 0px;
+    height: 20px;
+    cursor: pointer;
+    &:hover {
+      color: #05137c;
+    }
+    i {
+      font-size: 1.2rem;
+    }
+  }
+}
+.circle {
+  background-color: #05137c;
+  border-radius: 50px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 35px;
+  height: 35px;
+  transition: all 0.2s;
+}
+.calendar_body {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto auto auto;
+  column-gap: 4px;
+  align-items: center;
+  justify-content: center;
+  row-gap: 4px;
+  margin-bottom: 10px;
+}
+#selected {
+  color: white;
+}
+.calendar_week {
+  font-weight: bold;
+  margin: 0;
+  text-align: center;
+  padding-left: 5px;
+  padding-right: 5px;
+  width: max-content;
+  text-align: center;
+  font-size: 11px;
+}
+.calendar_day {
+  color: black;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  margin: auto;
+  font-size: 14px;
+  padding: 10px 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  width: max-content;
+  cursor: pointer;
+}
+.calendar_day.disabled {
+  color: #cccccc;
+  background-color: transparent;
+}

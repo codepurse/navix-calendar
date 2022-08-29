@@ -1,26 +1,30 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
-body {
-  font-family: "Inter";
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
+
 .calendar_container {
   border: 1px solid lightgray;
   width: max-content;
   box-sizing: content-box;
-  padding: 10px 15px;
-  padding-bottom: 5px;
-  min-width: 250px;
+  padding: 7px 15px;
+  min-width: 260px;
+  max-width: 260px;
+  font-family: "Inter";
   position: relative;
   height: fit-content;
-  transition: all 0.2s;
 }
 .calendarToggle {
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
   font-size: 1.2rem;
-  margin-bottom: -10px;
+  margin-bottom: -18px;
   cursor: pointer;
   i {
     transition: all 0.2s;
@@ -28,12 +32,11 @@ body {
 }
 .calendar_header {
   display: flex;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   background-color: transparent;
   padding: 5px 5px;
-  font-weight: 600;
-  font-size: 14px;
-  transition: all 0.2s;
+  font-weight: bold;
+  font-size: 15px;
   button {
     background-color: transparent;
     outline: none !important;
@@ -41,6 +44,9 @@ body {
     padding: 0px;
     height: 20px;
     cursor: pointer;
+    margin-left: 5px;
+    margin-right: -2px;
+    margin-top: -5px;
     &:hover {
       color: #05137c;
     }
@@ -55,18 +61,17 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 35px;
-  height: 35px;
+  width: 32px;
+  height: 32px;
   transition: all 0.2s;
 }
 .calendar_body {
   display: grid;
   grid-template-columns: auto auto auto auto auto auto auto;
-  column-gap: 4px;
+  column-gap: 5px;
   align-items: center;
   justify-content: center;
-  row-gap: 4px;
-  margin-bottom: 10px;
+  row-gap: 15px;
 }
 #selected {
   color: white;
@@ -83,20 +88,129 @@ body {
 }
 .calendar_day {
   color: black;
-  width: 100%;
-  height: 100%;
   background-color: transparent;
   margin: auto;
   font-size: 14px;
-  padding: 10px 0px;
   display: flex;
   align-items: center;
+  font-weight: 500;
   justify-content: center;
   z-index: 10;
+  padding-bottom: 5px;
   width: max-content;
   cursor: pointer;
+  height: max-content;
 }
 .calendar_day.disabled {
   color: #cccccc;
   background-color: transparent;
+}
+
+.divCalItems {
+  border: 1px solid lightgray;
+  margin-top: 15px;
+  width: 100%;
+  border-radius: 5px;
+  padding: 7px 15px;
+}
+
+.colSideCalendar {
+  min-width: 322px;
+  max-width: 322px;
+  .divCalItems {
+    .pHeader {
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 15px;
+    }
+    i {
+      display: flex;
+      font-size: 1.2rem;
+      margin-bottom: -3px;
+      margin-left: 10px;
+      transition: all 0.2s;
+    }
+    .divOverlay {
+      width: 250px;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: whitesmoke;
+      box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+        rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+      word-wrap: break-word;
+      white-space: normal;
+      margin-top: 10px;
+      line-height: 1.4rem;
+      p {
+        width: auto;
+        margin-bottom: 0px;
+      }
+    }
+  }
+  .divItems {
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+      rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+    border-radius: 5px;
+    padding: 8px 15px;
+    margin-top: 10px;
+    cursor: grab;
+    z-index: 999999999999;
+    &:hover {
+      background-color: #f4f5f7 !important;
+    }
+    .pHeader {
+      font-family: "Inter";
+      color: #2738ba;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+    .form-inline {
+      margin-left: -10px;
+      margin-bottom: 10px;
+      p {
+        font-family: "Inter";
+        margin-bottom: -5px;
+        font-size: 13px;
+        font-weight: 500;
+        margin-left: 10px;
+      }
+    }
+  }
+}
+
+[draggable="true"] {
+  /*
+ To prevent user selecting inside the drag source
+*/
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.divCalParent {
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  padding: 15px;
+  border-radius: 8px;
+  .iconPrev,
+  .iconNext {
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+      rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+    height: 30px;
+    width: 30px;
+    max-width: 30px;
+    max-height: 30px;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    border-radius: 60px;
+  }
+  .pHeader {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-right: 15px;
+    margin-bottom: 0px;
+  }
 }

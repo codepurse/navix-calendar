@@ -1,5 +1,6 @@
+import "@codepurse/navix/dist/components/styles/main.scss";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/globals.scss";
-
 function MyApp({ Component, pageProps }) {
   return <Component {...pageProps} />;
 }

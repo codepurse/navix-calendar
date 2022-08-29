@@ -1,11 +1,10 @@
 import moment from "moment";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { MdKeyboardArrowUp } from "react-icons/md";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 const weekNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 export default function App() {
-  const ref = useRef("");
   const [date, setDate] = useState(
     moment(new Date(new Date().getFullYear(), new Date().getMonth(), 1))
   );
@@ -37,9 +36,6 @@ export default function App() {
   );
 
   useEffect((e) => {
-    const elem = window
-      .getComputedStyle(ref.current)
-      .getPropertyValue("height");
     const element = document.getElementById("circle");
     try {
       var strLength = selectedDate.toString().replace(/\s+/g, "").length;
@@ -51,15 +47,11 @@ export default function App() {
     try {
       if (selectedDate && !toggle) {
         if (strLength < 2) {
-          element.style.left = dateSelected.offsetLeft - 14 + "px";
+          element.style.left = dateSelected.offsetLeft - 13 + "px";
         } else {
-          element.style.left = dateSelected.offsetLeft - 10 + "px";
+          element.style.left = dateSelected.offsetLeft - 8 + "px";
         }
-        if (elem === "265.188px") {
-          element.style.top = dateSelected.offsetTop + 22 + "px";
-        } else {
-          element.style.top = dateSelected.offsetTop + 10 + "px";
-        }
+        element.style.top = dateSelected.offsetTop - 5 + "px";
       }
     } catch (error) {}
   });
@@ -90,77 +82,72 @@ export default function App() {
   }
 
   return (
-    <div className="App">
-      <div className="calendar_container" id="calendar_container" ref={ref}>
-        <div
-          className="circle"
-          id="circle"
-          style={{ display: toggle ? "none" : selectedDate ? "" : "none" }}
-        ></div>
-        <div className="calendarToggle">
-          <i
-            style={{ transform: toggle ? "rotate(180deg)" : "rotate(0deg)" }}
-            onClick={(e) => {
-              setToggle((prev) => !prev);
-            }}
-          >
-            <MdKeyboardArrowUp />
+    <div className="calendar_container">
+      <div
+        className="circle"
+        id="circle"
+        style={{ display: toggle ? "none" : selectedDate ? "" : "none" }}
+      ></div>
+      <div className="calendarToggle">
+        <i
+          style={{ transform: toggle ? "rotate(180deg)" : "rotate(0deg)" }}
+          onClick={(e) => {
+            setToggle((prev) => !prev);
+          }}
+        >
+          <MdKeyboardArrowUp />
+        </i>
+      </div>
+      <div
+        className="calendar_header"
+        style={{ marginTop: toggle ? "-23px" : "" }}
+      >
+        <div className="calendar_month">{date.format("MMMM YYYY")}</div>
+        <button
+          onClick={(e) => {
+            handleClickPrev();
+            setSelectedDate(null);
+          }}
+        >
+          <i>
+            <RiArrowLeftSLine />
           </i>
-        </div>
-        <div
-          className="calendar_header"
-          style={{ marginTop: toggle ? "-23px" : "" }}
+        </button>
+        <button
+          onClick={(e) => {
+            handleClickNext();
+            setSelectedDate(null);
+          }}
         >
-          <div className="calendar_month">{date.format("MMMM YYYY")}</div>
-          <button
+          <i>
+            <RiArrowRightSLine />
+          </i>
+        </button>
+      </div>
+      <div className="calendar_body" style={{ display: toggle ? "none" : "" }}>
+        {weekNames?.map((wname, index) => (
+          <p key={index} className="calendar_week">
+            {wname}
+          </p>
+        ))}
+        {days?.map((day, index) => (
+          <p
+            key={index}
             onClick={(e) => {
-              handleClickPrev();
-              setSelectedDate(null);
+              if (!e.currentTarget.className.includes("disabled")) {
+                setSelectedDate(day);
+              }
             }}
+            id={selectedDate === day ? "selected" : ""}
+            className={`calendar_day ${
+              (day < 7 && index > 27) || (day > 20 && index < 7)
+                ? "disabled"
+                : ""
+            }`}
           >
-            <i>
-              <RiArrowLeftSLine />
-            </i>
-          </button>
-          <button
-            onClick={(e) => {
-              handleClickNext();
-              setSelectedDate(null);
-            }}
-          >
-            <i>
-              <RiArrowRightSLine />
-            </i>
-          </button>
-        </div>
-        <div
-          className="calendar_body"
-          style={{ display: toggle ? "none" : "" }}
-        >
-          {weekNames?.map((wname, index) => (
-            <p key={index} className="calendar_week">
-              {wname}
-            </p>
-          ))}
-          {days?.map((day, index) => (
-            <p
-              key={index}
-              onClick={(e) => {
-                if (!e.currentTarget.className.includes("disabled")) {
-                  setSelectedDate(day);
-                }
-              }}
-              id={selectedDate === day ? "selected" : ""}
-              className={`calendar_day ${
-                (day < 7 && index > 27) || (day > 20 && index < 7)
-                  ? "disabled"
-                  : ""
-              }`}
-            >
-              {day}
-            </p>
-          ))}
-        </div>
+            {day}
+          </p>
+        ))}
       </div>
     </div>
   );

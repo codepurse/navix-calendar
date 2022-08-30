@@ -1,9 +1,11 @@
 import { Button, SegmentedButton } from "@codepurse/navix";
+import { useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import CalendarItem from "./calendarItems";
 import CalendarWeek from "./calendarWeek";
 import CalendarMini from "./miniCalendar";
 export default function Calendar() {
+  const [date, setDate] = useState("");
   const segmentedArray = [
     {
       id: "one",
@@ -40,11 +42,15 @@ export default function Calendar() {
       </Row>
       <Row style={{ marginTop: "15px" }}>
         <Col className="colSideCalendar">
-          <CalendarMini />
+          <CalendarMini
+            onChange={(e) => {
+              setDate(e);
+            }}
+          />
           <CalendarItem />
         </Col>
         <Col>
-          <CalendarWeek />
+          <CalendarWeek date={date} />
         </Col>
       </Row>
     </Container>

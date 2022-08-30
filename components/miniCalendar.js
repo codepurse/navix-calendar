@@ -4,7 +4,7 @@ import { MdKeyboardArrowUp } from "react-icons/md";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 const weekNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-export default function App() {
+export default function App(props) {
   const [date, setDate] = useState(
     moment(new Date(new Date().getFullYear(), new Date().getMonth(), 1))
   );
@@ -12,9 +12,9 @@ export default function App() {
   const [selectedDate, setSelectedDate] = useState(dateNow.getDate());
   const [days, setDays] = useState(null);
   const [toggle, setToggle] = useState(false);
-
   useEffect(() => {
     setDays(getDaysInaMonth(date));
+    console.log(getDaysInaMonth(date));
   }, [date]);
 
   const handleClickPrev = useCallback(
@@ -136,9 +136,16 @@ export default function App() {
             onClick={(e) => {
               if (!e.currentTarget.className.includes("disabled")) {
                 setSelectedDate(day);
+                props.onChange(moment(date).add(day, "days").day(1));
               }
             }}
-            id={selectedDate === day ? "selected" : ""}
+            id={
+              selectedDate != day
+                ? ""
+                : (day < 7 && index > 27) || (day > 20 && index < 7)
+                ? ""
+                : "selected"
+            }
             className={`calendar_day ${
               (day < 7 && index > 27) || (day > 20 && index < 7)
                 ? "disabled"

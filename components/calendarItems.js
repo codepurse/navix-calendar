@@ -28,9 +28,11 @@ export default function CalendarItem() {
         </Overlay>
         <div
           className="divItems"
+          id="drag1"
           draggable
           onDragStart={(e) => {
-            drag(e);
+            console.log(e);
+            e.dataTransfer.setData("text", e.target.id);
           }}
         >
           <p className="pHeader">Task title</p>

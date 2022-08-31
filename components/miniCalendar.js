@@ -14,7 +14,6 @@ export default function App(props) {
   const [toggle, setToggle] = useState(false);
   useEffect(() => {
     setDays(getDaysInaMonth(date));
-    console.log(getDaysInaMonth(date));
   }, [date]);
 
   const handleClickPrev = useCallback(
@@ -41,7 +40,6 @@ export default function App(props) {
       var strLength = selectedDate.toString().replace(/\s+/g, "").length;
     } catch (error) {}
     try {
-      console.log(circle.currentTarget.style.display);
     } catch (error) {}
     const dateSelected = document.getElementById("selected");
     try {

@@ -158,9 +158,14 @@
     padding: 8px 15px;
     margin-top: 10px;
     cursor: grab;
-    z-index: 999999999999;
+    background-color: white;
+    position: relative;
+    z-index: 999999999999 !important;
     &:hover {
       background-color: #f4f5f7 !important;
+    }
+    div {
+      pointer-events: none;
     }
     .pHeader {
       font-family: "Inter";
@@ -256,6 +261,9 @@
           min-height: 50px;
           position: relative;
           transform: all 0.2s;
+          &:hover {
+            background-color: #1976d2;
+          }
           &:last-child {
             border-right: 0px;
           }
@@ -271,6 +279,9 @@
             height: 38px;
             overflow: auto;
           }
+        }
+        .tdDrag {
+          background: #1976d2 !important;
         }
       }
     }

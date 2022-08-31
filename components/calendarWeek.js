@@ -2,7 +2,6 @@ import { Space } from "@codepurse/navix";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
-import Draggable from "react-draggable";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 export default function CalendarWeek(props) {
   const [dateNow, setDateNow] = useState(props.date ? props.date : new Date());
@@ -34,6 +33,11 @@ export default function CalendarWeek(props) {
     },
     [props.date]
   );
+
+  function allowDrop(ev) {
+    ev.preventDefault();
+  }
+
   return (
     <Container className="divCalParent">
       <Row
@@ -78,65 +82,45 @@ export default function CalendarWeek(props) {
             </tr>
           </thead>
           <tbody>
-            {/*  <tr>
-              <td>
-                <div
-                  className="divTest"
-                  draggable
-                  onResize={(e) => {
-                    console.log("as");
-                  }}
-                ></div>
-              </td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr> */}
             {Array.from({ length: 18 }, (_, i) => (
               <tr>
                 <td
-                  onMouseEnter={(e) => {
-                    console.log(e);
+                  onDragOver={(e) => {
+                    allowDrop(e);
                   }}
                 >
-                  <Draggable
-                    onDrag={(e) => {
-                      /* console.log(e); */
-                    }}
-                    onStop={(e) => {
-                      console.log(e);
-                    }}
-                  >
-                    <div className="divTest"></div>
-                  </Draggable>
+                  <div className="divTest" draggable></div>
                 </td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td
+                  onDragOver={(e) => {
+                    allowDrop(e);
+                  }}
+                ></td>
+                <td
+                  onDragOver={(e) => {
+                    allowDrop(e);
+                  }}
+                ></td>
+                <td
+                  onDragOver={(e) => {
+                    allowDrop(e);
+                  }}
+                ></td>
+                <td
+                  onDragOver={(e) => {
+                    allowDrop(e);
+                  }}
+                ></td>
+                <td
+                  onDragOver={(e) => {
+                    allowDrop(e);
+                  }}
+                ></td>
+                <td
+                  onDragOver={(e) => {
+                    allowDrop(e);
+                  }}
+                ></td>
               </tr>
             ))}
           </tbody>

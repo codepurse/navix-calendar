@@ -18,10 +18,7 @@
     "react-dom": "18.2.0",
     "react-draggable": "^4.4.5",
     "react-icons": "^4.4.0",
+    "react-rnd": "^10.3.7",
     "sass": "^1.54.5"
-  },
-  "devDependencies": {
-    "eslint": "8.21.0",
-    "eslint-config-next": "12.2.4"
   }
 }

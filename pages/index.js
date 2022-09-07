@@ -3,9 +3,5 @@ const Calendar = dynamic(() => import("../components/calendar"), {
   ssr: false,
 });
 export default function Home() {
-  return (
-    <div>
-      <Calendar />
-    </div>
-  );
+  return <Calendar />;
 }

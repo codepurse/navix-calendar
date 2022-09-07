@@ -1,11 +1,13 @@
 import { Button, SegmentedButton } from "@codepurse/navix";
 import { useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
+import CalendarContext from "./calendarContext";
 import CalendarItem from "./calendarItems";
-import CalendarWeek from "./calendarWeek";
+import CalendarMain from "./calendarMain";
 import CalendarMini from "./miniCalendar";
 export default function Calendar() {
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(new Date());
+  const [view, setView] = useState("three");
   const segmentedArray = [
     {
       id: "one",
@@ -32,27 +34,34 @@ export default function Calendar() {
           >
             <SegmentedButton
               value={segmentedArray}
-              selected={2}
+              selected={3}
               onSelect={(e) => {
-                console.log(e);
+                setView(e);
               }}
             />
           </div>
         </Col>
       </Row>
-      <Row style={{ marginTop: "15px" }}>
-        <Col className="colSideCalendar">
-          <CalendarMini
-            onChange={(e) => {
-              setDate(e);
-            }}
-          />
-          <CalendarItem />
-        </Col>
-        <Col>
-          <CalendarWeek date={date} />
-        </Col>
-      </Row>
+      <CalendarContext.Provider value={{ date, setDate }}>
+        <Row style={{ marginTop: "15px" }}>
+          {view != "one" ? (
+            <Col className="colSideCalendar">
+              <CalendarMini
+                date={date ? date : null}
+                onChange={(e) => {
+                  setDate(e);
+                }}
+              />
+              <CalendarItem />
+            </Col>
+          ) : (
+            ""
+          )}
+          <Col>
+            <CalendarMain date={date} view={view} />
+          </Col>
+        </Row>
+      </CalendarContext.Provider>
     </Container>
   );
 }

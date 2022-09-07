@@ -1,12 +1,22 @@
+import { useUpdate } from "@codepurse/navix";
 import moment from "moment";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { MdKeyboardArrowUp } from "react-icons/md";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
+import CalendarContext from "./calendarContext";
 const weekNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 export default function App(props) {
+  const value = useContext(CalendarContext);
+  const month = new Date().getMonth();
   const [date, setDate] = useState(
-    moment(new Date(new Date().getFullYear(), new Date().getMonth(), 1))
+    moment(
+      new Date(
+        new Date(value.date).getFullYear(),
+        new Date(value.date).getMonth(),
+        1
+      )
+    )
   );
   const dateNow = new Date();
   const [selectedDate, setSelectedDate] = useState(dateNow.getDate());
@@ -32,6 +42,22 @@ export default function App(props) {
       setDate(clonedDate);
     },
     [date]
+  );
+
+  useUpdate(
+    (e) => {
+      console.log(new Date(value.date).getMonth());
+      setDate(
+        moment(
+          new Date(
+            new Date(value.date).getFullYear(),
+            new Date(value.date).getMonth(),
+            1
+          )
+        )
+      );
+    },
+    [value]
   );
 
   useEffect((e) => {

@@ -1,131 +1,131 @@
-import { Space } from "@codepurse/navix";
 import moment from "moment";
-import { useEffect, useState } from "react";
-import { Col, Container, Row } from "react-bootstrap";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import React, { useState } from "react";
+import useResizeAware from "react-resize-aware";
 export default function CalendarWeek(props) {
-  const [dateNow, setDateNow] = useState(props.date ? props.date : new Date());
-  const [date, setDate] = useState(
-    moment(new Date(new Date().getFullYear(), new Date().getMonth(), 1))
-  );
-  const [weeks, setWeeks] = useState();
-  function getThisWeekDates() {
-    var weekDates = [];
-    for (var i = 1; i <= 7; i++) {
-      weekDates.push(moment(dateNow).day(i - 1));
-    }
-    return weekDates;
-  }
-  useEffect(
-    (e) => {
-      var thisWeekDates = getThisWeekDates();
-      setWeeks(thisWeekDates);
-    },
-    [dateNow]
-  );
+  const customReporter = (target) => ({
+    clientWidth: target != null ? target.clientWidth : null,
+  });
 
-  useEffect(
-    (e) => {
-      if (props.date) {
-        console.log(props.date);
-        setDateNow(props.date);
-      }
-    },
-    [props.date]
-  );
+  const [resizeListener, sizes] = useResizeAware(customReporter);
+  const [selectedItem, setSelectedItem] = useState("");
+  const [weeks, setWeeks] = useState();
 
   function allowDrop(ev) {
     ev.preventDefault();
+    ev.currentTarget.classList.add("tdDrag");
   }
 
+  function onDragLeave(e) {
+    e.currentTarget.classList.remove("tdDrag");
+  }
+
+  function onDrop(e) {
+    e.currentTarget.classList.remove("tdDrag");
+    var data = e.dataTransfer.getData("text");
+    var div = document.createElement("div");
+    div.innerHTML = ` <div class = "divItemCal">
+    <p class="p1">Test</p>
+    <p class="p2">Test</p>
+  </div>`;
+
+    e.target.appendChild(div);
+  }
+
+  var ro = new ResizeObserver((entries) => {
+    for (let entry of entries) {
+      const cr = entry.contentRect;
+      console.log(cr.height);
+      return cr.height;
+    }
+  });
+
   return (
-    <Container className="divCalParent">
-      <Row
-        style={{ borderBottom: "1px solid lightgray", paddingBottom: "15px" }}
-      >
-        <Col lg={12}>
-          <div className="form-inline">
-            <p className="pHeader">{moment(dateNow).format("MMMM YYYY")}</p>
-            <Space gap={10}>
-              <i
-                className="iconPrev"
-                onClick={(e) => {
-                  setDateNow(moment(dateNow).subtract(7, "days").day(1));
-                }}
-              >
-                <FiChevronLeft />
-              </i>
-              <i
-                className="iconNext"
-                onClick={(e) => {
-                  setDateNow(moment(dateNow).add(7, "days").day(1));
-                }}
-              >
-                <FiChevronRight />
-              </i>
-            </Space>
-          </div>
-        </Col>
-      </Row>
-      <Row style={{ padding: "15px 0px" }}>
-        <table>
-          <thead>
-            <tr>
-              {weeks?.map((date, i) => (
-                <>
-                  <th key={i}>
-                    <p>{moment(date).format("dd")}</p>
-                    <p>{new Date(date).getDate()}</p>
-                  </th>
-                </>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {Array.from({ length: 18 }, (_, i) => (
-              <tr>
-                <td
-                  onDragOver={(e) => {
-                    allowDrop(e);
-                  }}
-                >
-                  <div className="divTest" draggable></div>
-                </td>
-                <td
-                  onDragOver={(e) => {
-                    allowDrop(e);
-                  }}
-                ></td>
-                <td
-                  onDragOver={(e) => {
-                    allowDrop(e);
-                  }}
-                ></td>
-                <td
-                  onDragOver={(e) => {
-                    allowDrop(e);
-                  }}
-                ></td>
-                <td
-                  onDragOver={(e) => {
-                    allowDrop(e);
-                  }}
-                ></td>
-                <td
-                  onDragOver={(e) => {
-                    allowDrop(e);
-                  }}
-                ></td>
-                <td
-                  onDragOver={(e) => {
-                    allowDrop(e);
-                  }}
-                ></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Row>
-    </Container>
+    <table>
+      <thead id="thead">
+        <tr>
+          {props.weeks?.map((date, i) => (
+            <th key={i}>
+              <p>{moment(date).format("dd")}</p>
+              <p>{new Date(date).getDate()}</p>
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {Array.from({ length: 18 }, (_, i) => (
+          <tr id={"tr" + i} key={i}>
+            <td>
+              <div
+                className="clDrop"
+                onDragOver={allowDrop}
+                onDragLeave={onDragLeave}
+                onDrop={onDrop}
+              ></div>
+              {(() => {
+                if (i == 0) {
+                  return (
+                    <div
+                      className="divItemCal"
+                      id={"divItemCal" + i}
+                      onMouseDown={(e) => {
+                        setSelectedItem(e.currentTarget.id);
+                        console.log("test");
+                        ro.observe(document.getElementById(e.currentTarget.id));
+                      }}
+                      onMouseUp={(e) => {
+                        ro.disconnect();
+                      }}
+                      onClick={(e) => {
+                        const element1 = document.getElementById("thead");
+                        const element = document.getElementById("tr1");
+                        console.log(element.offsetTop - element1.clientHeight);
+                        /*         console.log(
+                              ro.observe(document.getElementById(selectedItem))
+                            );
+                            ro.disconnect(); */
+                      }}
+                    >
+                      {resizeListener}
+                      <p className="p1"></p>
+                      <p className="p2">Test</p>
+                    </div>
+                  );
+                }
+              })()}
+            </td>
+            <td
+              onDragOver={allowDrop}
+              onDragLeave={onDragLeave}
+              onDrop={onDrop}
+            ></td>
+            <td
+              onDragOver={allowDrop}
+              onDragLeave={onDragLeave}
+              onDrop={onDrop}
+            ></td>
+            <td
+              onDragOver={allowDrop}
+              onDragLeave={onDragLeave}
+              onDrop={onDrop}
+            ></td>
+            <td
+              onDragOver={allowDrop}
+              onDragLeave={onDragLeave}
+              onDrop={onDrop}
+            ></td>
+            <td
+              onDragOver={allowDrop}
+              onDragLeave={onDragLeave}
+              onDrop={onDrop}
+            ></td>
+            <td
+              onDragOver={allowDrop}
+              onDragLeave={onDragLeave}
+              onDrop={onDrop}
+            ></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }

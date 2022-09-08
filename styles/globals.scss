@@ -429,4 +429,11 @@ body {
       color: white;
     }
   }
+  .selectedDay {
+    z-index: 9999;
+    opacity: 1 !important;
+  }
+  .unselectedDay {
+    opacity: 0.7;
+  }
 }

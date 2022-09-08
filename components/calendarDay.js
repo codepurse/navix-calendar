@@ -1,13 +1,38 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import Draggable from "react-draggable";
 import Moveable from "react-moveable";
 export default function CalendarDay(props) {
   const [target, setTarget] = React.useState("");
-  const [boundsHeight, setBoundsHeight] = useState(0);
+  const [mouseHold, setMouseHold] = useState(false);
+  const [mousePos, setMousePos] = useState(null);
   const [frame, setFrame] = React.useState({
     translate: [0, 0],
   });
+
+  const useMousePosition = () => {
+    const [mousePosition, setMousePosition] = React.useState({
+      x: null,
+      y: null,
+    });
+
+    React.useEffect(() => {
+      const updateMousePosition = (ev) => {
+        setMousePosition({ x: ev.clientX, y: ev.clientY });
+      };
+
+      window.addEventListener("mousemove", updateMousePosition);
+
+      return () => {
+        window.removeEventListener("mousemove", updateMousePosition);
+      };
+    }, []);
+
+    return mousePosition;
+  };
+
+  const mousePosition = useMousePosition();
+
   React.useEffect(() => {
     try {
       let str = target;
@@ -18,10 +43,6 @@ export default function CalendarDay(props) {
     } catch (error) {}
   }, [target]);
 
-  useEffect((e) => {
-    /*     setBoundsHeight(document.getElementById("tblDay").clientHeight); */
-  });
-
   function setBoundsTop(e) {
     let top = e * 50;
     return Math.abs(top) * -1;
@@ -31,6 +52,15 @@ export default function CalendarDay(props) {
     let bottom = 850 - startTop;
     return bottom;
   }
+
+  function setMaxHeight(e, node) {
+    let top = e * 50;
+    let calcHeight = 900 - node;
+    let mx = 900 - calcHeight;
+    console.log("Box height: ", node);
+    let height = 900 - top + 3 + "px";
+    return height;
+  }
   return (
     <table className="tblDay1">
       <Moveable
@@ -39,23 +69,28 @@ export default function CalendarDay(props) {
         resizable={true}
         renderDirections={["sw", "s", "se"]}
         edge={false}
+        snapDigit={0}
         snapThreshold={50}
-        snapGridHeight={50}
+        snapGridHeight={49.5}
         snappable={true}
         padding={{ left: 0, top: 0, right: 0, bottom: 0 }}
         onResizeStart={(e) => {
+          console.log(e.target.offsetParent);
           e.setOrigin(["%", "%"]);
           e.dragStart && e.dragStart.set(frame.translate);
         }}
-        onResizeEnd={(e) => {
-          console.log(e.target.clientHeight);
-        }}
+        onResizeEnd={(e) => {}}
         onResize={(e) => {
           const beforeTranslate = e.drag.beforeTranslate;
           frame.translate = beforeTranslate;
           e.target.style.width = `${e.width}px`;
           e.target.style.height = `${e.height}px`;
           e.target.style.transform = `translate(${beforeTranslate[0]}px, ${beforeTranslate[1]}px)`;
+          let max = setMaxHeight(
+            e.target.getAttribute("data-attr"),
+            e.target.clientHeight
+          );
+          e.target.style.maxHeight = max;
         }}
       />
       <thead>
@@ -73,38 +108,80 @@ export default function CalendarDay(props) {
               <Container style={{ marginTop: "-25px" }}>
                 <Row>
                   {(() => {
-                    if (i === 0 || i === 3) {
+                    if (i === 3 || i == 0) {
                       return (
                         <Fragment>
                           <Col>
                             <Draggable
                               axis="y"
+                              onMouseDown={(e) => {
+                                const spans =
+                                  document.querySelectorAll(".divItemCal");
+                                for (let i = 0; i < spans.length; i++) {
+                                  const span = spans[i];
+                                  span.classList.add("unselectedDay");
+                                }
+                                setMousePos(mousePosition.y);
+                              }}
                               bounds={{
                                 top: setBoundsTop(i),
                                 bottom: setBoundsBottom(i),
                               }}
                               grid={[50, 50]}
+                              onStop={(e) => {
+                                console.log("stop");
+                                setMousePos(0);
+                                document
+                                  .getElementById("targetDay" + i)
+                                  .classList.remove("selectedDay");
+                                const spans =
+                                  document.querySelectorAll(".divItemCal");
+                                for (let i = 0; i < spans.length; i++) {
+                                  const span = spans[i];
+                                  span.classList.remove("unselectedDay");
+                                }
+                              }}
+                              onDrag={(e) => {
+                                e.stopPropagation();
+                                document
+                                  .getElementById("targetDay" + i)
+                                  .classList.add("selectedDay");
+                                var parentPos = document
+                                  .getElementById("bodyDay")
+                                  .getBoundingClientRect();
+                                var childPos = document
+                                  .getElementById("targetDay" + i)
+                                  .getBoundingClientRect();
+                                let bottom = parentPos.bottom - childPos.bottom;
+                                let top = childPos.top - parentPos.top;
+                                /*     console.log("bottom", bottom);
+                                console.log("top", top);
+                                console.log(mousePosition.y); */
 
+                                setMousePos(mousePosition.y);
+                                if (bottom < 1) {
+                                  if (mousePosition.y < mousePos) {
+                                    console.log("bawal");
+                                    return true;
+                                  } else {
+                                    console.log("pwede");
+                                    return false;
+                                  }
+                                }
+                              }}
                               /*  offsetParent={document.getElementById("bodyDay")} */
                             >
                               <div
                                 className="divItemCal target"
                                 id={"targetDay" + i}
+                                onMouseDown={(e) => {}}
+                                onMouseUp={(e) => {
+                                  e.stopPropagation();
+                                  console.log("test");
+                                }}
+                                data-attr={i}
                                 onClick={(e) => {
                                   setTarget(e.currentTarget.id);
-                                  console.log(
-                                    document
-                                      .getElementById("thDay")
-                                      .getBoundingClientRect().top -
-                                      document.getElementById("thDay")
-                                        .clientHeight
-                                  );
-
-                                  console.log(
-                                    document
-                                      .getElementById("targetDay" + i)
-                                      .getBoundingClientRect().top
-                                  );
                                 }}
                               >
                                 <p className="p1"></p>

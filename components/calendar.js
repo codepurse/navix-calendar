@@ -23,7 +23,7 @@ export default function Calendar() {
     },
   ];
   return (
-    <Container style={{ marginTop: "40px" }}>
+    <Container style={{ marginTop: "40px", paddingBottom: "100px" }}>
       <Row>
         <Col lg={4}>
           <Button type="primary">Add Event</Button>

@@ -4,11 +4,10 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { MdKeyboardArrowUp } from "react-icons/md";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import CalendarContext from "./calendarContext";
-const weekNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+const weekNames = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
 export default function App(props) {
   const value = useContext(CalendarContext);
-  const month = new Date().getMonth();
   const [date, setDate] = useState(
     moment(
       new Date(
@@ -46,7 +45,6 @@ export default function App(props) {
 
   useUpdate(
     (e) => {
-      console.log(new Date(value.date).getMonth());
       setDate(
         moment(
           new Date(
@@ -87,7 +85,7 @@ export default function App(props) {
     const dayCount = mDate.daysInMonth();
     const days = [];
     for (let i = 0; i < week; i += 1) {
-      days.push(prevMDayCount - (week - i) + 1);
+      days.push(prevMDayCount - (week - i) + 2);
     }
     for (let i = 0; i < dayCount; i += 1) {
       days.push(i + 1);

@@ -1,12 +1,14 @@
 import moment from "moment";
-import React, { Fragment } from "react";
+import React, { Fragment, useContext } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import Draggable from "react-draggable";
 import Moveable from "react-moveable";
 import { ItemCalendar, Time } from "../json/itemCalendar";
+import CalendarContext from "./calendarContext";
 export default function CalendarDay(props) {
+  const { date } = useContext(CalendarContext);
   const [target, setTarget] = React.useState("");
-  const [frame, setFrame] = React.useState({
+  const [frame] = React.useState({
     translate: [0, 0],
   });
 
@@ -18,16 +20,17 @@ export default function CalendarDay(props) {
         setTarget(document.getElementById(target));
       }
     } catch (error) {}
+    console.log(date);
   }, [target]);
 
   function setMaxHeight(e, node) {
-    let top = e * 50;
-    let calcHeight = 900 - node;
-    let mx = 900 - calcHeight;
-    console.log("Box height: ", node);
-    let height = 900 - top + 3 + "px";
-    console.log("Test");
-    return height;
+    var parentPos = document.getElementById("bodyDay").getBoundingClientRect();
+    var childPos = e.getBoundingClientRect();
+    let top = childPos.top - parentPos.top;
+    let max = 900 - top - 50 + "px";
+    console.log("max:", max);
+    console.log(top);
+    return max;
   }
 
   function setTop(e) {
@@ -38,33 +41,33 @@ export default function CalendarDay(props) {
     return moment.duration(moment(x).diff(y)).asHours() * 50;
   }
 
+  function setWidth(x) {
+    var width = 100 - x * 5 + "%";
+    return width;
+  }
+
   return (
     <table className="tblDay1">
       <Moveable
         target={target}
         resizable={true}
         renderDirections={["sw", "s", "se"]}
-        edge={false}
-        snapDigit={0}
         snapThreshold={50}
-        snapGridHeight={49.5}
         snappable={true}
-        padding={{ left: 0, top: 0, right: 0, bottom: 0 }}
         onResizeStart={(e) => {
           e.setOrigin(["%", "%"]);
           e.dragStart && e.dragStart.set(frame.translate);
         }}
-        onResizeEnd={(e) => {}}
+        onResizeEnd={(e) => {
+          console.log(e.target.style.height);
+        }}
         onResize={(e) => {
           const beforeTranslate = e.drag.beforeTranslate;
           frame.translate = beforeTranslate;
           e.target.style.width = `${e.width}px`;
           e.target.style.height = `${e.height}px`;
           e.target.style.transform = `translate(${beforeTranslate[0]}px, ${beforeTranslate[1]}px)`;
-          let max = setMaxHeight(
-            e.target.getAttribute("data-attr"),
-            e.target.clientHeight
-          );
+          let max = setMaxHeight(e.target);
           e.target.style.maxHeight = max;
         }}
       />
@@ -73,9 +76,11 @@ export default function CalendarDay(props) {
           <th
             style={{ minWidth: "50px", maxWidth: "50px", width: "50px" }}
           ></th>
-          <th id="thDay">
-            <p>Wed</p>
-            <p>1</p>
+          <th>
+            <div className="divTh">
+              <p>{moment(date).format("dd")}</p>
+              <p>{new Date(date).getDate()}</p>
+            </div>
           </th>
         </tr>
       </thead>
@@ -83,65 +88,64 @@ export default function CalendarDay(props) {
         {Time.map((number, i) => (
           <tr key={i} data-time={i === 12 ? "13" : ""} id={"trDay" + i}>
             <td>{number}</td>
-            <td className="tdDay"></td>
+            <td></td>
           </tr>
         ))}
         <Container className="conTblDay">
           <Row>
             <Fragment>
               <Col>
-                <Draggable
-                  axis="y"
-                  onMouseDown={(e) => {
-                    const spans = document.querySelectorAll(".divItemCal");
-                    for (let i = 0; i < spans.length; i++) {
-                      const span = spans[i];
-                      span.classList.add("unselectedDay");
-                    }
-                  }}
-                  grid={[50, 50]}
-                  bounds={"#bodyDay"}
-                  onStop={(e) => {
-                    document
-                      .getElementById("targetDay")
-                      .classList.remove("selectedDay");
-                    const spans = document.querySelectorAll(".divItemCal");
-                    for (let i = 0; i < spans.length; i++) {
-                      const span = spans[i];
-                      span.classList.remove("unselectedDay");
-                    }
-                  }}
-                  onDrag={(e) => {
-                    e.stopPropagation();
-                    document
-                      .getElementById("targetDay")
-                      .classList.add("selectedDay");
-                  }}
-                  /*  offsetParent={document.getElementById("bodyDay")} */
-                >
-                  <div
-                    style={{
-                      top: setTop(ItemCalendar[0].date_from),
-                      height: setHeight(
-                        ItemCalendar[0].date_to,
-                        ItemCalendar[0].date_from
-                      ),
+                {ItemCalendar.map((event, i) => (
+                  <Draggable
+                    axis="y"
+                    onMouseDown={(e) => {
+                      const spans = document.querySelectorAll(".divItemCal");
+                      for (let i = 0; i < spans.length; i++) {
+                        const span = spans[i];
+                        span.classList.add("unselectedDay");
+                      }
                     }}
-                    className="divItemCal target"
-                    id={"targetDay"}
-                    onMouseDown={(e) => {}}
-                    onMouseUp={(e) => {
+                    grid={[50, 50]}
+                    bounds={"#bodyDay"}
+                    onStop={(e) => {
+                      document
+                        .getElementById("targetDay" + i)
+                        .classList.remove("selectedDay");
+                      const spans = document.querySelectorAll(".divItemCal");
+                      for (let i = 0; i < spans.length; i++) {
+                        const span = spans[i];
+                        span.classList.remove("unselectedDay");
+                      }
+                    }}
+                    onDrag={(e) => {
                       e.stopPropagation();
-                      console.log("test");
-                    }}
-                    onClick={(e) => {
-                      setTarget(e.currentTarget.id);
+                      document
+                        .getElementById("targetDay" + i)
+                        .classList.add("selectedDay");
                     }}
                   >
-                    <p className="p1"></p>
-                    <p className="p2">Meeting with John Sins</p>
-                  </div>
-                </Draggable>
+                    <div
+                      style={{
+                        top: setTop(event.date_from),
+                        height: setHeight(event.date_to, event.date_from),
+                        width: setWidth(i),
+                      }}
+                      className="divItemCal target"
+                      id={"targetDay" + i}
+                      onMouseDown={(e) => {}}
+                      onMouseUp={(e) => {
+                        e.stopPropagation();
+                        console.log("test");
+                      }}
+                      onClick={(e) => {
+                        setTarget(e.currentTarget.id);
+                      }}
+                    >
+                      <p className="p1"></p>
+                      <p className="p2">Meeting with John Sins</p>
+                    </div>
+                  </Draggable>
+                ))}
               </Col>
             </Fragment>
           </Row>

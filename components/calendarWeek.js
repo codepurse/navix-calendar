@@ -1,48 +1,22 @@
 import moment from "moment";
-import React, { useState } from "react";
-import useResizeAware from "react-resize-aware";
+import React, { useEffect } from "react";
+import { Col, Container, Row } from "react-bootstrap";
+import { ItemMonth, Time } from "../json/itemCalendar";
 export default function CalendarWeek(props) {
-  const customReporter = (target) => ({
-    clientWidth: target != null ? target.clientWidth : null,
-  });
+  useEffect(() => {
+    console.log(ItemMonth);
+  }, []);
 
-  const [resizeListener, sizes] = useResizeAware(customReporter);
-  const [selectedItem, setSelectedItem] = useState("");
-  const [weeks, setWeeks] = useState();
-
-  function allowDrop(ev) {
-    ev.preventDefault();
-    ev.currentTarget.classList.add("tdDrag");
+  function setTop(e) {
+    return (moment(e).hour() - 8) * 50;
   }
-
-  function onDragLeave(e) {
-    e.currentTarget.classList.remove("tdDrag");
-  }
-
-  function onDrop(e) {
-    e.currentTarget.classList.remove("tdDrag");
-    var data = e.dataTransfer.getData("text");
-    var div = document.createElement("div");
-    div.innerHTML = ` <div class = "divItemCal">
-    <p class="p1">Test</p>
-    <p class="p2">Test</p>
-  </div>`;
-
-    e.target.appendChild(div);
-  }
-
-  var ro = new ResizeObserver((entries) => {
-    for (let entry of entries) {
-      const cr = entry.contentRect;
-      console.log(cr.height);
-      return cr.height;
-    }
-  });
-
   return (
-    <table>
+    <table className="tblWeek">
       <thead id="thead">
         <tr>
+          <th
+            style={{ minWidth: "50px", maxWidth: "50px", width: "50px" }}
+          ></th>
           {props.weeks?.map((date, i) => (
             <th key={i}>
               <p>{moment(date).format("dd")}</p>
@@ -51,80 +25,39 @@ export default function CalendarWeek(props) {
           ))}
         </tr>
       </thead>
-      <tbody>
-        {Array.from({ length: 18 }, (_, i) => (
-          <tr id={"tr" + i} key={i}>
-            <td>
-              <div
-                className="clDrop"
-                onDragOver={allowDrop}
-                onDragLeave={onDragLeave}
-                onDrop={onDrop}
-              ></div>
-              {(() => {
-                if (i == 0) {
-                  return (
-                    <div
-                      className="divItemCal"
-                      id={"divItemCal" + i}
-                      onMouseDown={(e) => {
-                        setSelectedItem(e.currentTarget.id);
-                        console.log("test");
-                        ro.observe(document.getElementById(e.currentTarget.id));
-                      }}
-                      onMouseUp={(e) => {
-                        ro.disconnect();
-                      }}
-                      onClick={(e) => {
-                        const element1 = document.getElementById("thead");
-                        const element = document.getElementById("tr1");
-                        console.log(element.offsetTop - element1.clientHeight);
-                        /*         console.log(
-                              ro.observe(document.getElementById(selectedItem))
-                            );
-                            ro.disconnect(); */
-                      }}
-                    >
-                      {resizeListener}
-                      <p className="p1"></p>
-                      <p className="p2">Test</p>
-                    </div>
-                  );
-                }
-              })()}
-            </td>
-            <td
-              onDragOver={allowDrop}
-              onDragLeave={onDragLeave}
-              onDrop={onDrop}
-            ></td>
-            <td
-              onDragOver={allowDrop}
-              onDragLeave={onDragLeave}
-              onDrop={onDrop}
-            ></td>
-            <td
-              onDragOver={allowDrop}
-              onDragLeave={onDragLeave}
-              onDrop={onDrop}
-            ></td>
-            <td
-              onDragOver={allowDrop}
-              onDragLeave={onDragLeave}
-              onDrop={onDrop}
-            ></td>
-            <td
-              onDragOver={allowDrop}
-              onDragLeave={onDragLeave}
-              onDrop={onDrop}
-            ></td>
-            <td
-              onDragOver={allowDrop}
-              onDragLeave={onDragLeave}
-              onDrop={onDrop}
-            ></td>
+      <tbody id="bodyDay">
+        {Time.map((number, i) => (
+          <tr key={i} data-time={i === 12 ? "13" : ""} id={"trDay" + i}>
+            <td>{number}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
           </tr>
         ))}
+        <Container className="conTblWeek">
+          <Row>
+            <Col>
+              <div
+                className="divItemMonth"
+                style={{
+                  top: setTop(ItemMonth.results.data.Monday[0].date_from),
+                }}
+              >
+                <p className="p1">Task Title</p>
+              </div>
+            </Col>
+            <Col></Col>
+            <Col></Col>
+            <Col></Col>
+            <Col></Col>
+            <Col></Col>
+            <Col></Col>
+          </Row>
+        </Container>
       </tbody>
     </table>
   );

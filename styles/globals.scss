@@ -239,6 +239,7 @@ body {
     thead {
       border-bottom: 1px solid lightgray;
       th {
+        padding: 10px;
         text-align: center;
         font-weight: 400;
         p {
@@ -246,7 +247,7 @@ body {
           &:last-child {
             font-weight: 700;
             font-size: 21px;
-            margin-bottom: 10px;
+            margin-bottom: 0px;
           }
         }
       }
@@ -371,6 +372,18 @@ body {
   }
 }
 
+.tblWeek {
+  td {
+    user-select: none;
+    height: 50px;
+    min-height: 50px;
+    font-family: "Inter";
+    color: gray;
+    font-size: 13px;
+    text-align: center;
+  }
+}
+
 .tblDay {
   thead {
     th {
@@ -408,6 +421,12 @@ body {
 }
 
 .tblDay1 {
+  .divTh {
+    width: max-content;
+  }
+  th {
+    text-align: center;
+  }
   td {
     user-select: none;
     height: 50px;
@@ -420,10 +439,10 @@ body {
   }
   .divItemCal {
     user-select: none;
-    width: calc(100% - 50px);
     min-height: 50px;
     left: auto !important;
     right: 0px !important;
+    border-radius: 5px;
     padding: 8px;
     p {
       color: white;
@@ -435,6 +454,7 @@ body {
   }
   .unselectedDay {
     opacity: 0.7;
+    z-index: 0;
   }
 }
 
@@ -448,9 +468,39 @@ body {
   }
 }
 
-.conTblDay {
+.conTblDay,
+.conTblWeek {
   position: absolute;
   top: 0px;
-  left: 0px;
+  left: auto !important;
+  right: 0px !important;
+  width: calc(100% - 50px);
   margin-top: 0px;
+}
+
+.conTblWeek {
+  height: 100%;
+  width: calc(100% - 51px);
+  .col {
+    margin-top: 2px;
+    background-color: transparent !important;
+    padding: 2px;
+    .divItemMonth {
+      background-color: #f4f4f4;
+      border-radius: 5px;
+      padding: 2px;
+      min-height: 48px;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 100%;
+      p {
+        font-size: 11px;
+        margin-bottom: 1px;
+        &:last-child {
+          font-size: 10px;
+        }
+      }
+    }
+  }
 }

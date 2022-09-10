@@ -53,6 +53,7 @@ export default function CalendarDay(props) {
         resizable={true}
         renderDirections={["sw", "s", "se"]}
         snapThreshold={50}
+        snapGridHeight={50}
         snappable={true}
         onResizeStart={(e) => {
           e.setOrigin(["%", "%"]);

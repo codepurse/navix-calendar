@@ -481,19 +481,24 @@ body {
 .conTblWeek {
   height: 100%;
   width: calc(100% - 51px);
+  .row {
+    height: 100%;
+  }
   .col {
+    height: 100%;
     margin-top: 2px;
     background-color: transparent !important;
     padding: 2px;
     .divItemMonth {
-      background-color: #f4f4f4;
+      background-color: #039be5;
+      border: 1px solid white;
       border-radius: 5px;
       padding: 2px;
-      min-height: 48px;
       position: absolute;
       top: 0px;
       left: 0px;
       width: 100%;
+      min-height: 50px;
       p {
         font-size: 11px;
         margin-bottom: 1px;

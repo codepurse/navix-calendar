@@ -23,6 +23,12 @@ export const ItemMonth = {
           location: "Mental Health House",
           subject: "Visiting Jhony",
         },
+        {
+          date_from: "2022-08-11 17:12:00",
+          date_to: "2022-08-11 20:12:00",
+          location: "Mental Health House",
+          subject: "Visiting Jhony",
+        },
       ],
       Tuesday: [
         {

@@ -44,8 +44,8 @@ export default function CalendarWeek(props) {
   });
  */
   var events = [
-    { id: 1, start: 0, end: 150 }, // an event from 9:am to 10:30am
-    { id: 2, start: 130, end: 250 }, // an event from 6pm to 7pm
+    // an event from 9:am to 10:30am
+    { id: 1, start: 105, end: 220 }, // an event from 6pm to 7pm
   ];
 
   var layOutDay = function (events) {
@@ -66,7 +66,7 @@ export default function CalendarWeek(props) {
         timeslots[j].push(event.id);
       }
     }
-    for (i = 0; i < 720; i++) {
+    for (i = 0; i < 1000; i++) {
       var next_hindex = 0;
       var timeslotLength = timeslots[i].length;
       if (timeslotLength > 0) {
@@ -89,7 +89,16 @@ export default function CalendarWeek(props) {
       event.pxw = 160 / event.cevc;
       event.pxx = event.hindex * event.pxw;
       returnEvent.push(
-        <Draggable axis="y" grid={[50, 50]} bounds={"parent"}>
+        <Draggable
+          axis="y"
+          grid={[
+            50,
+            Math.abs(roundnum(event.pxy) - event.pxy) === 0
+              ? 50
+              : Math.abs(roundnum(event.pxy) - event.pxy),
+          ]}
+          bounds={"parent"}
+        >
           <div
             className="divItemMonth "
             id={"targetWeekTues" + i}
@@ -107,18 +116,19 @@ export default function CalendarWeek(props) {
           </div>
         </Draggable>
       );
-      console.log(events[i]);
-
+      /* console.log(event.pxy); */
       /*  document.getElementById("conTblWeek").appendChild(div); */
     }
 
     return returnEvent;
   };
 
-  function mapData() {}
+  function roundnum(num) {
+    return Math.round(num / 50) * 50;
+  }
 
   useEffect((e) => {
-    console.log(layOutDay(events));
+    console.log(Math.abs(Math.abs(roundnum(130) - 130) - 50));
   }, []);
 
   return (

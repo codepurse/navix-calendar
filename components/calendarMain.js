@@ -26,7 +26,7 @@ export default function CalendarMain(props) {
   );
 
   return (
-    <Container className="divCalParent">
+    <Container fluid className="divCalParent">
       <Row
         style={{ borderBottom: "1px solid lightgray", paddingBottom: "15px" }}
       >

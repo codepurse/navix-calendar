@@ -1,6 +1,6 @@
 import { useUpdate } from "@codepurse/navix";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import Moveable from "react-moveable";
 import { ItemMonth } from "../json/itemCalendar";
 export default function CalendarMonth(props) {
@@ -156,7 +156,38 @@ export default function CalendarMonth(props) {
         {days.map((date, y) => (
           <tr key={y}>
             {date.map((d, i) => (
-              <td key={i}></td>
+              <td key={i}>
+                <div
+                  className="divMonthInner"
+                  id={"divMonth" + i + y}
+                  data-id={d}
+                  onDragOver={allowDrop}
+                  onDragLeave={onDragLeave}
+                  onDrop={onDrop}
+                >
+                  <p className="pDay"> {d}</p>
+                  {d === 5 || d === 23 ? (
+                    <Fragment>
+                      <div
+                        className="divListMonth"
+                        id={"monthItem" + d}
+                        style={{ minWidth: snapHeight - 20 + "px" }}
+                        onClick={(e) => {
+                          setTarget(e.currentTarget.id);
+                        }}
+                        onMouseDown={(e) => {
+                          setSelectedItem(e.currentTarget.id);
+                        }}
+                        draggable
+                      >
+                        <p className="p1">Meeting with Johnny Sins</p>
+                      </div>
+                    </Fragment>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              </td>
             ))}
           </tr>
         ))}

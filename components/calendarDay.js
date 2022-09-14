@@ -20,7 +20,6 @@ export default function CalendarDay(props) {
         setTarget(document.getElementById(target));
       }
     } catch (error) {}
-    console.log(date);
   }, [target]);
 
   function setMaxHeight(e, node) {

@@ -6,14 +6,11 @@ import Moveable from "react-moveable";
 import { Time } from "../json/itemCalendar";
 export default function CalendarWeek(props) {
   const [target, setTarget] = React.useState("");
-  const [maxWidth, setMaxWidth] = useState("");
+  const [events, setEvents] = useState([{ id: 1, start: 70, end: 150 }]);
+  const [position, setPosition] = useState(null);
   const [frame] = React.useState({
     translate: [0, 0],
   });
-
-  function setTop(e) {
-    return (moment(e).hour() - 8) * 50;
-  }
 
   function setMaxHeight(e, node) {
     var parentPos = document.getElementById("bodyDay").getBoundingClientRect();
@@ -24,12 +21,7 @@ export default function CalendarWeek(props) {
     console.log(top);
     return max;
   }
-
-  function setHeight(x, y) {
-    return moment.duration(moment(x).diff(y)).asHours() * 50;
-  }
-
-  React.useEffect(() => {
+  useEffect(() => {
     try {
       let str = target;
       let letterCount = str.replace(/\s+/g, "").length;
@@ -38,15 +30,13 @@ export default function CalendarWeek(props) {
       }
     } catch (error) {}
   }, [target]);
-
-  /*   useEffect((e) => {
-    console.log(document.getElementById("bodyDay").clientWidth / 7);
-  });
- */
-  var events = [
-    // an event from 9:am to 10:30am
-    { id: 1, start: 105, end: 220 }, // an event from 6pm to 7pm
-  ];
+  useEffect(
+    (e) => {
+      console.log(events);
+      /*  console.log(roundnum(102)); */
+    },
+    [events]
+  );
 
   var layOutDay = function (events) {
     var eventsLength = events.length;
@@ -95,42 +85,67 @@ export default function CalendarWeek(props) {
             50,
             Math.abs(roundnum(event.pxy) - event.pxy) === 0
               ? 50
-              : Math.abs(roundnum(event.pxy) - event.pxy),
+              : Math.abs(Math.abs(roundnum(event.pxy) - event.pxy) - 50),
           ]}
+          position={position}
           bounds={"parent"}
+          onStop={(e) => {
+            setPosition({ y: 0, x: 0 });
+            var parentPos = document
+              .getElementById("bodyDay")
+              .getBoundingClientRect();
+            var childPos = e.target.getBoundingClientRect();
+            let top = childPos.top - parentPos.top;
+            let height = top + e.target.clientHeight;
+            setTime(top, height, e.target.getAttribute("data-id"));
+          }}
         >
           <div
             className="divItemMonth "
-            id={"targetWeekTues" + i}
+            id={"targetTues" + i}
+            data-id={i + 1}
+            onMouseUp={(e) => {
+              e.stopPropagation();
+              console.log("test");
+            }}
             onClick={(e) => {
+              e.stopPropagation();
               setTarget(e.currentTarget.id);
             }}
             style={{
               width: event.pxw + "px",
-              top: event.pxy + "px",
               height: event.pxh + "px",
               left: event.pxx + "px",
+              top: event.pxy + "px",
             }}
           >
             <p className="p1">Task Title</p>
           </div>
         </Draggable>
       );
-      /* console.log(event.pxy); */
-      /*  document.getElementById("conTblWeek").appendChild(div); */
     }
 
     return returnEvent;
   };
 
+  function setTime(x, y, z) {
+    const newState = events.map((obj) => {
+      if (obj.id === parseInt(z)) {
+        if (obj.top != x) {
+          return { ...obj, start: Math.round(x / 50) * 50, end: y };
+        } else {
+          return { ...obj };
+        }
+      }
+      return obj;
+    });
+
+    setEvents(newState);
+  }
+
   function roundnum(num) {
     return Math.round(num / 50) * 50;
   }
-
-  useEffect((e) => {
-    console.log(Math.abs(Math.abs(roundnum(130) - 130) - 50));
-  }, []);
-
   return (
     <table className="tblWeek">
       <Moveable

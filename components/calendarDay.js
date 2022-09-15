@@ -46,7 +46,9 @@ export default function CalendarDay(props) {
     },
     [events]
   );
-
+  function isWhatPercentOf(numA, numB) {
+    return (numA / numB) * 100;
+  }
   useEffect((e) => {
     setWidth(document.getElementById("bodyDay").offsetWidth);
   });
@@ -89,7 +91,7 @@ export default function CalendarDay(props) {
       event = eventsSort[i];
       event.pxh = event.end - event.start;
       event.pxy = event.start;
-      event.pxw = width / event.cevc - 25;
+      event.pxw = width / event.cevc;
       event.pxx = event.hindex * event.pxw;
       event.cevc = null;
       event.hindex = null;
@@ -133,9 +135,9 @@ export default function CalendarDay(props) {
               setTarget(e.currentTarget.id);
             }}
             style={{
-              width: event.pxw + "px",
+              width: isWhatPercentOf(event.pxw, width).toFixed(2) + "%",
               height: event.pxh + "px",
-              left: event.pxx + "px",
+              left: isWhatPercentOf(event.pxx, width).toFixed(2) + "%",
               top: event.pxy + "px",
               background:
                 bgcolor[Math.floor(Math.random() * bgcolor.length)] + "95",

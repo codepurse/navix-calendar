@@ -6,7 +6,15 @@ import Moveable from "react-moveable";
 import { Time } from "../json/itemCalendar";
 export default function CalendarWeek(props) {
   const [target, setTarget] = React.useState("");
-  const [events, setEvents] = useState([{ id: 1, start: 70, end: 150 }]);
+  const [eventsMon, setEvents] = useState([
+    { id: 1, start: 50, end: 250 },
+    { id: 2, start: 250, end: 300 },
+    { id: 3, start: 200, end: 300 },
+  ]);
+  const [eventsTues, setEventsTues] = useState([
+    { id: 1, start: 50, end: 250 },
+    { id: 2, start: 350, end: 400 },
+  ]);
   const [position, setPosition] = useState(null);
   const [frame] = React.useState({
     translate: [0, 0],
@@ -16,9 +24,9 @@ export default function CalendarWeek(props) {
     var parentPos = document.getElementById("bodyDay").getBoundingClientRect();
     var childPos = e.getBoundingClientRect();
     let top = childPos.top - parentPos.top;
-    let max = 900 - top - 50 + "px";
-    console.log("max:", max);
-    console.log(top);
+    let height = childPos.height;
+    let offsetTop = top + height;
+    let max = height + (850 - offsetTop) + 5 + "px";
     return max;
   }
   useEffect(() => {
@@ -30,27 +38,22 @@ export default function CalendarWeek(props) {
       }
     } catch (error) {}
   }, [target]);
-  useEffect(
-    (e) => {
-      console.log(events);
-      /*  console.log(roundnum(102)); */
-    },
-    [events]
-  );
 
-  var layOutDay = function (events) {
-    var eventsLength = events.length;
+  function layOutDay(data, cname) {
+    console.log("data", data);
+    var eventsLength = data.length;
     var timeslots = [];
     var event, i, j;
     var returnEvent = [];
-    events = events.sort(function (a, b) {
+    var eventsSort = [];
+    eventsSort = data.sort(function (a, b) {
       return a.id - b.id;
     });
     for (i = 0; i < 1000; i++) {
       timeslots[i] = [];
     }
     for (i = 0; i < eventsLength; i++) {
-      event = events[i];
+      event = eventsSort[i];
 
       for (j = event.start; j < event.end; j++) {
         timeslots[j].push(event.id);
@@ -61,19 +64,22 @@ export default function CalendarWeek(props) {
       var timeslotLength = timeslots[i].length;
       if (timeslotLength > 0) {
         for (j = 0; j < timeslotLength; j++) {
-          event = events[timeslots[i][j] - 1];
-          if (!event.cevc || event.cevc < timeslotLength) {
+          event = eventsSort[timeslots[i][j] - 1];
+          event.cevc = timeslotLength;
+          event.hindex = next_hindex;
+          next_hindex++;
+          /*    if (!event.cevc || event.cevc < timeslotLength) {
             event.cevc = timeslotLength;
             if (!event.hindex) {
               event.hindex = next_hindex;
               next_hindex++;
             }
-          }
+          } */
         }
       }
     }
-    for (i = 0; i < events.length; i++) {
-      event = events[i];
+    for (i = 0; i < eventsSort.length; i++) {
+      event = eventsSort[i];
       event.pxh = event.end - event.start;
       event.pxy = event.start;
       event.pxw = 160 / event.cevc;
@@ -83,9 +89,9 @@ export default function CalendarWeek(props) {
           axis="y"
           grid={[
             50,
-            Math.abs(roundnum(event.pxy) - event.pxy) === 0
+            Math.abs(roundnum(event.start) - event.start) === 0
               ? 50
-              : Math.abs(Math.abs(roundnum(event.pxy) - event.pxy) - 50),
+              : Math.abs(Math.abs(roundnum(event.start) - event.start) - 50),
           ]}
           position={position}
           bounds={"parent"}
@@ -97,16 +103,21 @@ export default function CalendarWeek(props) {
             var childPos = e.target.getBoundingClientRect();
             let top = childPos.top - parentPos.top;
             let height = top + e.target.clientHeight;
-            setTime(top, height, e.target.getAttribute("data-id"));
+            setTime(
+              top,
+              height,
+              e.target.getAttribute("data-id"),
+              e.target.getAttribute("data-data")
+            );
           }}
         >
           <div
             className="divItemMonth "
-            id={"targetTues" + i}
+            id={cname + i}
             data-id={i + 1}
+            data-data={cname}
             onMouseUp={(e) => {
               e.stopPropagation();
-              console.log("test");
             }}
             onClick={(e) => {
               e.stopPropagation();
@@ -124,12 +135,12 @@ export default function CalendarWeek(props) {
         </Draggable>
       );
     }
-
     return returnEvent;
-  };
+  }
 
-  function setTime(x, y, z) {
-    const newState = events.map((obj) => {
+  function setTime(x, y, z, cname) {
+    let arr = cname === "Mon" ? eventsMon : eventsTues;
+    const newState = arr.map((obj) => {
       if (obj.id === parseInt(z)) {
         if (obj.top != x) {
           return { ...obj, start: Math.round(x / 50) * 50, end: y };
@@ -139,8 +150,11 @@ export default function CalendarWeek(props) {
       }
       return obj;
     });
-
-    setEvents(newState);
+    if (cname === "Mon") {
+      setEvents(newState);
+    } else {
+      setEventsTues(newState);
+    }
   }
 
   function roundnum(num) {
@@ -160,8 +174,13 @@ export default function CalendarWeek(props) {
           e.dragStart && e.dragStart.set(frame.translate);
         }}
         onResizeEnd={(e) => {
-          console.log(e.target.style.height);
-          console.log(e.target);
+          var parentPos = document
+            .getElementById("bodyDay")
+            .getBoundingClientRect();
+          var childPos = e.target.getBoundingClientRect();
+          let top = childPos.top - parentPos.top;
+          let height = top + e.target.clientHeight;
+          setTime(top, height, parseInt(e.target.getAttribute("data-id")));
         }}
         onResize={(e) => {
           const beforeTranslate = e.drag.beforeTranslate;
@@ -201,8 +220,8 @@ export default function CalendarWeek(props) {
         ))}
         <Container fluid className="conTblWeek" id="conTblWeek">
           <Row>
-            <Col>{layOutDay(events)}</Col>
-            <Col></Col>
+            <Col>{layOutDay(eventsMon, "Mon")}</Col>
+            <Col>{layOutDay(eventsTues, "Tue")}</Col>
             <Col></Col>
             <Col></Col>
             <Col></Col>

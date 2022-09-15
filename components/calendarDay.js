@@ -1,17 +1,24 @@
 import moment from "moment";
-import React, { Fragment, useContext } from "react";
+import React, { Fragment, useContext, useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import Draggable from "react-draggable";
 import Moveable from "react-moveable";
-import { ItemCalendar, Time } from "../json/itemCalendar";
+import { Time } from "../json/itemCalendar";
 import CalendarContext from "./calendarContext";
 export default function CalendarDay(props) {
   const { date } = useContext(CalendarContext);
   const [target, setTarget] = React.useState("");
+  const [width, setWidth] = useState();
+  const [position, setPosition] = useState(null);
   const [frame] = React.useState({
     translate: [0, 0],
   });
 
+  const [events, setEvents] = useState([
+    { id: 1, start: 50, end: 250 },
+    { id: 2, start: 250, end: 300 },
+    { id: 3, start: 350, end: 400 },
+  ]);
   React.useEffect(() => {
     try {
       let str = target;
@@ -26,23 +33,139 @@ export default function CalendarDay(props) {
     var parentPos = document.getElementById("bodyDay").getBoundingClientRect();
     var childPos = e.getBoundingClientRect();
     let top = childPos.top - parentPos.top;
-    let max = 900 - top - 50 + "px";
-    console.log("max:", max);
-    console.log(top);
+    let height = childPos.height;
+    let offsetTop = top + height;
+    let max = height + (850 - offsetTop) + 5 + "px";
     return max;
   }
 
-  function setTop(e) {
-    return (moment(e).hour() - 8) * 50;
+  var bgcolor = ["#9f77ed", "#12b76a", "#ebaa08", "#2196F3", "#3F51B5"];
+  useEffect(
+    (e) => {
+      console.log(events);
+    },
+    [events]
+  );
+
+  useEffect((e) => {
+    setWidth(document.getElementById("bodyDay").offsetWidth);
+  });
+
+  function layOutDay(data, cname) {
+    var eventsLength = data.length;
+    var timeslots = [];
+    var event, i, j;
+    var returnEvent = [];
+    var eventsSort = [];
+    eventsSort = data.sort(function (a, b) {
+      return a.id - b.id;
+    });
+    eventsSort.cevc = 0;
+    for (i = 0; i < 1000; i++) {
+      timeslots[i] = [];
+    }
+    for (i = 0; i < eventsLength; i++) {
+      event = eventsSort[i];
+
+      for (j = event.start; j < event.end; j++) {
+        timeslots[j].push(event.id);
+      }
+    }
+    for (i = 0; i < 1000; i++) {
+      var next_hindex = 0;
+      var timeslotLength = timeslots[i].length;
+      if (timeslotLength > 0) {
+        for (j = 0; j < timeslotLength; j++) {
+          event = events[timeslots[i][j] - 1];
+          if (!event.cevc || event.cevc < timeslotLength || event === null) {
+            event.cevc = timeslotLength;
+          }
+          event.hindex = next_hindex;
+          next_hindex++;
+        }
+      }
+    }
+    for (i = 0; i < eventsSort.length; i++) {
+      event = eventsSort[i];
+      event.pxh = event.end - event.start;
+      event.pxy = event.start;
+      event.pxw = width / event.cevc - 25;
+      event.pxx = event.hindex * event.pxw;
+      event.cevc = null;
+      event.hindex = null;
+      returnEvent.push(
+        <Draggable
+          axis="y"
+          grid={[
+            50,
+            Math.abs(roundnum(event.start) - event.start) === 0
+              ? 50
+              : Math.abs(Math.abs(roundnum(event.start) - event.start) - 50),
+          ]}
+          position={position}
+          bounds={"parent"}
+          onStop={(e) => {
+            setPosition({ y: 0, x: 0 });
+            var parentPos = document
+              .getElementById("bodyDay")
+              .getBoundingClientRect();
+            var childPos = e.target.getBoundingClientRect();
+            let top = childPos.top - parentPos.top;
+            let height = top + e.target.clientHeight;
+            setTime(
+              top,
+              height,
+              e.target.getAttribute("data-id"),
+              e.target.getAttribute("data-data")
+            );
+          }}
+        >
+          <div
+            className="divItemMonth "
+            id={cname + i}
+            data-id={i + 1}
+            data-data={cname}
+            onMouseUp={(e) => {
+              e.stopPropagation();
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setTarget(e.currentTarget.id);
+            }}
+            style={{
+              width: event.pxw + "px",
+              height: event.pxh + "px",
+              left: event.pxx + "px",
+              top: event.pxy + "px",
+              background:
+                bgcolor[Math.floor(Math.random() * bgcolor.length)] + "95",
+            }}
+            bac
+          >
+            <p className="p1">Task Title</p>
+          </div>
+        </Draggable>
+      );
+    }
+    return returnEvent;
   }
 
-  function setHeight(x, y) {
-    return moment.duration(moment(x).diff(y)).asHours() * 50;
+  function setTime(x, y, z) {
+    const newState = events.map((obj) => {
+      if (obj.id === parseInt(z)) {
+        if (obj.top != x) {
+          return { ...obj, start: Math.round(x / 50) * 50, end: y };
+        } else {
+          return { ...obj };
+        }
+      }
+      return obj;
+    });
+    setEvents(newState);
   }
 
-  function setWidth(x) {
-    var width = 100 - x * 5 + "%";
-    return width;
+  function roundnum(num) {
+    return Math.round(num / 50) * 50;
   }
 
   return (
@@ -91,62 +214,10 @@ export default function CalendarDay(props) {
             <td></td>
           </tr>
         ))}
-        <Container className="conTblDay">
+        <Container fluid className="conTblDay">
           <Row>
             <Fragment>
-              <Col>
-                {ItemCalendar.map((event, i) => (
-                  <Draggable
-                    axis="y"
-                    onMouseDown={(e) => {
-                      const spans = document.querySelectorAll(".divItemCal");
-                      for (let i = 0; i < spans.length; i++) {
-                        const span = spans[i];
-                        span.classList.add("unselectedDay");
-                      }
-                    }}
-                    grid={[50, 50]}
-                    bounds={"#bodyDay"}
-                    onStop={(e) => {
-                      document
-                        .getElementById("targetDay" + i)
-                        .classList.remove("selectedDay");
-                      const spans = document.querySelectorAll(".divItemCal");
-                      for (let i = 0; i < spans.length; i++) {
-                        const span = spans[i];
-                        span.classList.remove("unselectedDay");
-                      }
-                    }}
-                    onDrag={(e) => {
-                      e.stopPropagation();
-                      document
-                        .getElementById("targetDay" + i)
-                        .classList.add("selectedDay");
-                    }}
-                  >
-                    <div
-                      style={{
-                        top: setTop(event.date_from),
-                        height: setHeight(event.date_to, event.date_from),
-                        width: setWidth(i),
-                      }}
-                      className="divItemCal target"
-                      id={"targetDay" + i}
-                      onMouseDown={(e) => {}}
-                      onMouseUp={(e) => {
-                        e.stopPropagation();
-                        console.log("test");
-                      }}
-                      onClick={(e) => {
-                        setTarget(e.currentTarget.id);
-                      }}
-                    >
-                      <p className="p1"></p>
-                      <p className="p2">Meeting with John Sins</p>
-                    </div>
-                  </Draggable>
-                ))}
-              </Col>
+              <Col>{layOutDay(events)}</Col>
             </Fragment>
           </Row>
         </Container>

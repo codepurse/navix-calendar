@@ -459,6 +459,25 @@ body {
     opacity: 0.7;
     z-index: 0;
   }
+  .divItemMonth {
+    border-radius: 3px;
+    padding: 2px;
+    border: 1px solid white;
+    position: absolute;
+    right: 0px;
+    width: 100%;
+    min-height: 50px;
+    margin-right: auto;
+    margin-left: 0px;
+    color: white;
+    p {
+      font-size: 11px;
+      margin-bottom: 1px;
+      &:last-child {
+        font-size: 10px;
+      }
+    }
+  }
 }
 
 #bodyDay {
@@ -481,7 +500,8 @@ body {
   margin-top: 0px;
 }
 
-.conTblWeek {
+.conTblWeek,
+.conTblDay {
   height: 100%;
   width: calc(100% - 51px);
   .row {

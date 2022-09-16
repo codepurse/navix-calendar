@@ -158,7 +158,7 @@ export default function App(props) {
             onClick={(e) => {
               if (!e.currentTarget.className.includes("disabled")) {
                 setSelectedDate(day);
-                props.onChange(moment(date).add(day, "days").day(1));
+                props.onChange(moment(date).set("date", day));
               }
             }}
             id={

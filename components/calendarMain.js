@@ -21,6 +21,8 @@ export default function CalendarMain(props) {
     (e) => {
       var thisWeekDates = getThisWeekDates();
       setWeeks(thisWeekDates);
+      console.log(thisWeekDates);
+      console.log(date);
     },
     [date]
   );

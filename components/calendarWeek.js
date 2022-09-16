@@ -6,6 +6,7 @@ import Moveable from "react-moveable";
 import { Time } from "../json/itemCalendar";
 export default function CalendarWeek(props) {
   const [target, setTarget] = React.useState("");
+  const [width, setWidth] = useState();
   const [eventsMon, setEvents] = useState([
     { id: 1, start: 50, end: 250 },
     { id: 2, start: 250, end: 300 },
@@ -18,6 +19,10 @@ export default function CalendarWeek(props) {
   const [position, setPosition] = useState(null);
   const [frame] = React.useState({
     translate: [0, 0],
+  });
+
+  useEffect((e) => {
+    setWidth(parseInt(document.getElementById("conTblWeek").offsetWidth / 7));
   });
 
   function setMaxHeight(e, node) {
@@ -39,8 +44,8 @@ export default function CalendarWeek(props) {
     } catch (error) {}
   }, [target]);
 
+  var bgcolor = ["#9f77ed", "#12b76a", "#ebaa08", "#2196F3", "#3F51B5"];
   function layOutDay(data, cname) {
-    console.log("data", data);
     var eventsLength = data.length;
     var timeslots = [];
     var event, i, j;
@@ -82,7 +87,7 @@ export default function CalendarWeek(props) {
       event = eventsSort[i];
       event.pxh = event.end - event.start;
       event.pxy = event.start;
-      event.pxw = 160 / event.cevc;
+      event.pxw = width / event.cevc;
       event.pxx = event.hindex * event.pxw;
       returnEvent.push(
         <Draggable
@@ -124,10 +129,12 @@ export default function CalendarWeek(props) {
               setTarget(e.currentTarget.id);
             }}
             style={{
-              width: event.pxw + "px",
+              width: isWhatPercentOf(event.pxw, width).toFixed(2) + "%",
+              left: isWhatPercentOf(event.pxx, width).toFixed(2) + "%",
               height: event.pxh + "px",
-              left: event.pxx + "px",
               top: event.pxy + "px",
+              background:
+                bgcolor[Math.floor(Math.random() * bgcolor.length)] + "95",
             }}
           >
             <p className="p1">Task Title</p>
@@ -159,6 +166,10 @@ export default function CalendarWeek(props) {
 
   function roundnum(num) {
     return Math.round(num / 50) * 50;
+  }
+
+  function isWhatPercentOf(numA, numB) {
+    return (numA / numB) * 100;
   }
   return (
     <table className="tblWeek">

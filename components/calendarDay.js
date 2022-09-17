@@ -1,5 +1,5 @@
 import moment from "moment";
-import React, { Fragment, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import Draggable from "react-draggable";
 import Moveable from "react-moveable";
@@ -7,17 +7,18 @@ import { Time } from "../json/itemCalendar";
 import CalendarContext from "./calendarContext";
 export default function CalendarDay(props) {
   const { date } = useContext(CalendarContext);
+  const [dragStart, setDragStart] = useState(false);
   const [target, setTarget] = React.useState("");
   const [width, setWidth] = useState();
   const [position, setPosition] = useState(null);
+  const [top, setTop] = useState(0);
   const [frame] = React.useState({
     translate: [0, 0],
   });
 
   const [events, setEvents] = useState([
-    { id: 1, start: 50, end: 250 },
+    { id: 1, start: 50, end: 150 },
     { id: 2, start: 250, end: 300 },
-    { id: 3, start: 350, end: 400 },
   ]);
   React.useEffect(() => {
     try {
@@ -51,7 +52,7 @@ export default function CalendarDay(props) {
   }
   useEffect((e) => {
     setWidth(document.getElementById("bodyDay").offsetWidth);
-  });
+  }, []);
 
   function layOutDay(data, cname) {
     var eventsLength = data.length;
@@ -139,8 +140,8 @@ export default function CalendarDay(props) {
               height: event.pxh + "px",
               left: isWhatPercentOf(event.pxx, width).toFixed(2) + "%",
               top: event.pxy + "px",
-              background:
-                bgcolor[Math.floor(Math.random() * bgcolor.length)] + "95",
+              background: "#12b76a",
+              opacity: dragStart ? "0.5" : "",
             }}
             bac
           >
@@ -213,14 +214,34 @@ export default function CalendarDay(props) {
         {Time.map((number, i) => (
           <tr key={i} data-time={i === 12 ? "13" : ""} id={"trDay" + i}>
             <td>{number}</td>
-            <td></td>
+            <td
+              onDragEnter={(e, text) => {
+                e.preventDefault();
+                document.getElementById("divTimeClone").style.display = "block";
+                setTop(e.currentTarget.offsetTop);
+                setDragStart(true);
+                e.dataTransfer.setDragImage(new Image(), 0, 0);
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                console.log("drop");
+                setDragStart(false);
+                events.push({
+                  id: events.length + 1,
+                  start: top,
+                  end: top + 50,
+                });
+              }}
+            ></td>
           </tr>
         ))}
-        <Container fluid className="conTblDay">
+        <Container fluid className="conTblDay" id="conTblDay">
           <Row>
-            <Fragment>
-              <Col>{layOutDay(events)}</Col>
-            </Fragment>
+            <div id="divTimeClone" style={{ top: top + "px" }}></div>
+            <Col>{layOutDay(events)}</Col>
           </Row>
         </Container>
       </tbody>

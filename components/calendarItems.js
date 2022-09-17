@@ -52,12 +52,28 @@ export default function CalendarItem() {
             draggable
             onDragStart={(e) => {
               e.dataTransfer.setData("text", e.target.id);
+              try {
+                document.getElementById("conTblDay").style.pointerEvents =
+                  "none";
+              } catch (error) {
+                document.getElementById("conTblWeek").style.pointerEvents =
+                  "none";
+              }
             }}
             onDragEnd={(e) => {
               if (e.dataTransfer.dropEffect === "copy") {
                 console.log(item.splice(i, 1));
                 setItem(item.splice(i, 1));
               }
+              try {
+                document.getElementById("conTblDay").style.pointerEvents =
+                  "auto";
+              } catch (error) {
+                document.getElementById("conTblWeek").style.pointerEvents =
+                  "auto";
+              }
+              document.getElementById("divTimeClone").style.top = "-1000px";
+              document.getElementById("divTimeClone").style.display = "none";
             }}
           >
             <p className="pHeader">{data.title}</p>

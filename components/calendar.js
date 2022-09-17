@@ -34,6 +34,7 @@ export default function Calendar() {
           >
             <SegmentedButton
               value={segmentedArray}
+              selected={3}
               onSelect={(e) => {
                 console.log(e);
                 setView(e);

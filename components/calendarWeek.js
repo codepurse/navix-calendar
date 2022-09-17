@@ -6,10 +6,16 @@ import Moveable from "react-moveable";
 import { Time } from "../json/itemCalendar";
 export default function CalendarWeek(props) {
   const [target, setTarget] = React.useState("");
+  const [top, setTop] = useState(0);
+  const [dragStart, setDragStart] = useState(false);
+  const weekName = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const [left, setLeft] = useState(0);
   const [width, setWidth] = useState();
+  const [day, setDay] = useState("");
+  const [id, setId] = useState("");
   const [eventsMon, setEvents] = useState([
     { id: 1, start: 50, end: 250 },
-    { id: 2, start: 250, end: 300 },
+    { id: 2, start: 250, end: 350 },
     { id: 3, start: 200, end: 300 },
   ]);
   const [eventsTues, setEventsTues] = useState([
@@ -100,6 +106,15 @@ export default function CalendarWeek(props) {
           ]}
           position={position}
           bounds={"parent"}
+          onStart={(e) => {
+            console.log(e);
+            setId(e.target.getAttribute("data-id"));
+            setDay(e.target.getAttribute("data-data"));
+            console.log(
+              e.target.getAttribute("data-id"),
+              e.target.getAttribute("data-data")
+            );
+          }}
           onStop={(e) => {
             setPosition({ y: 0, x: 0 });
             var parentPos = document
@@ -108,12 +123,13 @@ export default function CalendarWeek(props) {
             var childPos = e.target.getBoundingClientRect();
             let top = childPos.top - parentPos.top;
             let height = top + e.target.clientHeight;
-            setTime(
+            console.log(
               top,
               height,
               e.target.getAttribute("data-id"),
               e.target.getAttribute("data-data")
             );
+            setTime(top, height, id, day);
           }}
         >
           <div
@@ -133,8 +149,8 @@ export default function CalendarWeek(props) {
               left: isWhatPercentOf(event.pxx, width).toFixed(2) + "%",
               height: event.pxh + "px",
               top: event.pxy + "px",
-              background:
-                bgcolor[Math.floor(Math.random() * bgcolor.length)] + "95",
+              background: bgcolor[Math.floor(Math.random() * bgcolor.length)],
+              opacity: dragStart ? "0.5" : "",
             }}
           >
             <p className="p1">Task Title</p>
@@ -183,6 +199,7 @@ export default function CalendarWeek(props) {
         onResizeStart={(e) => {
           e.setOrigin(["%", "%"]);
           e.dragStart && e.dragStart.set(frame.translate);
+          setDay(e.target.getAttribute("data-data"));
         }}
         onResizeEnd={(e) => {
           var parentPos = document
@@ -191,7 +208,7 @@ export default function CalendarWeek(props) {
           var childPos = e.target.getBoundingClientRect();
           let top = childPos.top - parentPos.top;
           let height = top + e.target.clientHeight;
-          setTime(top, height, parseInt(e.target.getAttribute("data-id")));
+          setTime(top, height, parseInt(e.target.getAttribute("data-id")), day);
         }}
         onResize={(e) => {
           const beforeTranslate = e.drag.beforeTranslate;
@@ -219,18 +236,61 @@ export default function CalendarWeek(props) {
       <tbody id="bodyDay">
         {Time.map((number, i) => (
           <tr key={i} data-time={i === 12 ? "13" : ""} id={"trDay" + i}>
-            <td>{number}</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td
+              onDragEnter={(e) => {
+                console.log("test");
+              }}
+            >
+              {number}
+            </td>
+
+            {Array.from({ length: 7 }, (_, i) => (
+              <td
+                data-day={weekName[i]}
+                onDragEnter={(e, text) => {
+                  e.preventDefault();
+                  document.getElementById("divTimeClone").style.display =
+                    "block";
+                  setTop(e.currentTarget.offsetTop);
+                  setLeft(e.currentTarget.offsetLeft);
+                  setDragStart(true);
+                  e.dataTransfer.setDragImage(new Image(), 0, 0);
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  let x = e.target.getAttribute("data-day");
+                  setDragStart(false);
+                  if (x == "Mon") {
+                    eventsMon.push({
+                      id: eventsMon.length + 1,
+                      start: top,
+                      end: top + 50,
+                    });
+                  } else {
+                    eventsTues.push({
+                      id: eventsTues.length + 1,
+                      start: top,
+                      end: top + 50,
+                    });
+                  }
+                }}
+              ></td>
+            ))}
           </tr>
         ))}
         <Container fluid className="conTblWeek" id="conTblWeek">
           <Row>
+            <div
+              id="divTimeClone"
+              style={{
+                top: top + "px",
+                width: width + "px",
+                left: left - 50 + "px",
+              }}
+            ></div>
             <Col>{layOutDay(eventsMon, "Mon")}</Col>
             <Col>{layOutDay(eventsTues, "Tue")}</Col>
             <Col></Col>

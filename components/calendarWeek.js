@@ -13,15 +13,11 @@ export default function CalendarWeek(props) {
   const [width, setWidth] = useState();
   const [day, setDay] = useState("");
   const [id, setId] = useState("");
-  const [eventsMon, setEvents] = useState([
-    { id: 1, start: 50, end: 250 },
-    { id: 2, start: 250, end: 350 },
-    { id: 3, start: 200, end: 300 },
-  ]);
+  const [eventsMon, setEvents] = useState([{ id: 1, start: 50, end: 250 }]);
   const [eventsTues, setEventsTues] = useState([
-    { id: 1, start: 50, end: 250 },
-    { id: 2, start: 350, end: 400 },
+    { id: 1, start: 300, end: 350 },
   ]);
+  const [eventsWed, setEventsWed] = useState([{ id: 1, start: 300, end: 350 }]);
   const [position, setPosition] = useState(null);
   const [frame] = React.useState({
     translate: [0, 0],
@@ -50,7 +46,14 @@ export default function CalendarWeek(props) {
     } catch (error) {}
   }, [target]);
 
+  useEffect((e) => {
+    console.log(document.getElementById("conTblWeek").offsetTop);
+  }, []);
+
   var bgcolor = ["#9f77ed", "#12b76a", "#ebaa08", "#2196F3", "#3F51B5"];
+
+  function moveHorizontal(e) {}
+
   function layOutDay(data, cname) {
     var eventsLength = data.length;
     var timeslots = [];
@@ -95,25 +98,31 @@ export default function CalendarWeek(props) {
       event.pxy = event.start;
       event.pxw = width / event.cevc;
       event.pxx = event.hindex * event.pxw;
+      var maxLeft = cname === "Mon" ? 0 : -Math.abs(width) - 5;
+      var maxRight =
+        cname === "Mon" ? Math.abs(width * 6) + 15 : Math.abs(width * 5) + 15;
+      let maxBottom = 850 - event.end;
       returnEvent.push(
         <Draggable
-          axis="y"
           grid={[
-            50,
+            width + 3,
             Math.abs(roundnum(event.start) - event.start) === 0
               ? 50
               : Math.abs(Math.abs(roundnum(event.start) - event.start) - 50),
           ]}
+          bounds={{
+            top: -Math.abs(event.start),
+            bottom: maxBottom,
+            left: maxLeft,
+            right: maxRight,
+          }}
           position={position}
-          bounds={"parent"}
           onStart={(e) => {
-            console.log(e);
             setId(e.target.getAttribute("data-id"));
             setDay(e.target.getAttribute("data-data"));
-            console.log(
-              e.target.getAttribute("data-id"),
-              e.target.getAttribute("data-data")
-            );
+            e.currentTarget.style.width = "100%";
+            e.currentTarget.style.left = "0px";
+            e.currentTarget.style.zIndex = "999999999999999";
           }}
           onStop={(e) => {
             setPosition({ y: 0, x: 0 });
@@ -123,13 +132,79 @@ export default function CalendarWeek(props) {
             var childPos = e.target.getBoundingClientRect();
             let top = childPos.top - parentPos.top;
             let height = top + e.target.clientHeight;
+            try {
+              e.target.style.zIndex = "auto";
+            } catch (error) {}
+            console.log(e.target.getAttribute("data-data"));
+            console.log(childPos.left);
             console.log(
-              top,
-              height,
-              e.target.getAttribute("data-id"),
-              e.target.getAttribute("data-data")
+              document.getElementById("colMon").getBoundingClientRect().left
             );
-            setTime(top, height, id, day);
+
+            if (
+              childPos.left ===
+              document.getElementById("colTues").getBoundingClientRect().left
+            ) {
+              if (e.target.getAttribute("data-data") === "Tue") {
+                console.log("a");
+                console.log(top, height, id, day);
+                setTime(top, height, id, day);
+              } else {
+                var offsetCol = document
+                  .getElementById("colTues")
+                  .getBoundingClientRect().left;
+                if (childPos.left >= offsetCol) {
+                  console.log("b");
+                  let getInSequence = (filterId) => {
+                    return eventsMon
+                      .filter(({ id }) => !filterId.includes(id))
+                      .map((v, i) => ({ ...v, id: i + 1 }));
+                  };
+                  setEvents(
+                    getInSequence([parseInt(e.target.getAttribute("data-id"))])
+                  );
+                  eventsTues.push({
+                    id: eventsTues.length + 1,
+                    start: top,
+                    end: parseInt(top + e.target.clientHeight),
+                  });
+                } else {
+                }
+              }
+            } else if (
+              childPos.left ===
+              document.getElementById("colMon").getBoundingClientRect().left
+            ) {
+              console.log("move to monday");
+              if (e.target.getAttribute("data-data") === "Mon") {
+                console.log("a");
+                console.log(top, height, id, day);
+                setTime(top, height, id, day);
+              } else {
+                var offsetCol = document
+                  .getElementById("colMon")
+                  .getBoundingClientRect().left;
+                if (childPos.left >= offsetCol) {
+                  console.log("b");
+                  let getInSequence = (filterId) => {
+                    return eventsTues
+                      .filter(({ id }) => !filterId.includes(id))
+                      .map((v, i) => ({ ...v, id: i + 1 }));
+                  };
+                  setEventsTues(
+                    getInSequence([parseInt(e.target.getAttribute("data-id"))])
+                  );
+                  eventsMon.push({
+                    id: eventsMon.length + 1,
+                    start: top,
+                    end: parseInt(top + e.target.clientHeight),
+                  });
+                } else {
+                }
+              }
+            } else {
+              setTime(top, height, id, day);
+            }
           }}
         >
           <div
@@ -137,6 +212,8 @@ export default function CalendarWeek(props) {
             id={cname + i}
             data-id={i + 1}
             data-data={cname}
+            data-end={event.end}
+            data-start={event.start}
             onMouseUp={(e) => {
               e.stopPropagation();
             }}
@@ -291,13 +368,17 @@ export default function CalendarWeek(props) {
                 left: left - 50 + "px",
               }}
             ></div>
-            <Col>{layOutDay(eventsMon, "Mon")}</Col>
-            <Col>{layOutDay(eventsTues, "Tue")}</Col>
-            <Col></Col>
-            <Col></Col>
-            <Col></Col>
-            <Col></Col>
-            <Col></Col>
+            <Col style={{ maxWidth: width + 3 + "px" }} id="colMon">
+              {layOutDay(eventsMon, "Mon")}
+            </Col>
+            <Col style={{ maxWidth: width + 3 + "px" }} id="colTues">
+              {layOutDay(eventsTues, "Tue")}
+            </Col>
+            <Col style={{ maxWidth: width + 3 + "px" }} id="colWed"></Col>
+            <Col style={{ maxWidth: width + "px" }}></Col>
+            <Col style={{ maxWidth: width + "px" }}></Col>
+            <Col style={{ maxWidth: width + "px" }}></Col>
+            <Col style={{ maxWidth: width + "px" }}></Col>
           </Row>
         </Container>
       </tbody>

@@ -1,12 +1,8 @@
 import { useUpdate } from "@codepurse/navix";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import Moveable from "react-moveable";
-import { ItemMonth } from "../json/itemCalendar";
 export default function CalendarMonth(props) {
   const weekName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const [snapHeight, setSnapHeight] = useState(0);
-  const [minHeight, setMinHeight] = useState(0);
   const [date, setDate] = useState(
     moment(
       new Date(
@@ -17,16 +13,7 @@ export default function CalendarMonth(props) {
     )
   );
   const [days, setDays] = useState([]);
-  const [selectedItem, setSelectedItem] = useState();
   const [target, setTarget] = React.useState("");
-  const [frame] = React.useState({
-    translate: [0, 0],
-  });
-
-  useEffect((e) => {
-    setSnapHeight(document.getElementById("tblBodyMonth").clientWidth / 7);
-    console.log(ItemMonth);
-  }, []);
 
   function getDaysInaMonth(mDate) {
     const date = mDate.toDate();
@@ -92,57 +79,8 @@ export default function CalendarMonth(props) {
     } catch (error) {}
   }, [target]);
 
-  function allowDrop(ev) {
-    ev.preventDefault();
-    ev.currentTarget.classList.add("tdDrag");
-  }
-  function onDragLeave(e) {
-    e.currentTarget.classList.remove("tdDrag");
-  }
-  function onDrop(e) {
-    console.log(e.currentTarget.id);
-    e.currentTarget.classList.remove("tdDrag");
-    document
-      .getElementById(e.currentTarget.id)
-      .appendChild(document.getElementById(selectedItem));
-  }
-
-  function setMaxWidth(e) {
-    var parentPos = document
-      .getElementById("tblBodyMonth")
-      .getBoundingClientRect();
-    var childPos = e.getBoundingClientRect();
-    let left = childPos.left - parentPos.left;
-    let max = left - snapHeight;
-    console.log(max);
-    return max;
-  }
   return (
     <table style={{ height: "100%" }} className="tblMonth">
-      <Moveable
-        target={target}
-        resizable={true}
-        renderDirections={["e"]}
-        snapThreshold={snapHeight}
-        snapGridWidth={snapHeight}
-        snappable={true}
-        onResizeStart={(e) => {
-          e.setOrigin(["%", "%"]);
-          e.dragStart && e.dragStart.set(frame.translate);
-        }}
-        onResizeEnd={(e) => {
-          console.log(e.target.style.height);
-        }}
-        onResize={(e) => {
-          const beforeTranslate = e.drag.beforeTranslate;
-          frame.translate = beforeTranslate;
-          e.target.style.width = `${e.width}px`;
-          e.target.style.height = `${e.height}px`;
-          e.target.style.transform = `translate(${beforeTranslate[0]}px, ${beforeTranslate[1]}px)`;
-          let max = setMaxWidth(e.target);
-          /* e.target.style.maxHeight = max; */
-        }}
-      />
       <thead>
         <tr>
           {weekName.map((date, i) => (
@@ -156,7 +94,11 @@ export default function CalendarMonth(props) {
         {days.map((date, y) => (
           <tr key={y}>
             {date.map((d, i) => (
-              <td key={i}></td>
+              <td key={i}>
+                <div className="divMonthInner">
+                  <p className="pDay"> {d}</p>
+                </div>
+              </td>
             ))}
           </tr>
         ))}

@@ -7,7 +7,7 @@ import CalendarMain from "./calendarMain";
 import CalendarMini from "./miniCalendar";
 export default function Calendar() {
   const [date, setDate] = useState(new Date());
-  const [view, setView] = useState("three");
+  const [view, setView] = useState("two");
   const segmentedArray = [
     {
       id: "one",
@@ -34,7 +34,7 @@ export default function Calendar() {
           >
             <SegmentedButton
               value={segmentedArray}
-              selected={3}
+              selected={2}
               onSelect={(e) => {
                 console.log(e);
                 setView(e);

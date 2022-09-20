@@ -505,10 +505,12 @@ body {
 .conTblWeek,
 .conTblDay {
   height: 100%;
-  width: calc(100% - 51px);
+  width: calc(100% - 65.5px);
+  padding: 0px;
   .row {
     height: 100%;
     position: relative;
+    padding: 0px;
     #divTimeClone {
       position: absolute;
       top: 0px;
@@ -525,12 +527,11 @@ body {
     height: 100%;
     margin-top: 2px;
     background-color: transparent !important;
-    padding: 2px;
     .divItemMonth {
       background-color: #12b76a;
       border-radius: 3px;
       padding: 2px;
-      border: 1px solid white;
+      border: 1px solid gray;
       position: absolute;
       right: 0px;
       width: 100%;
